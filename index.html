@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panjat Pinang Matematika</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,sans-serif;color:#17304d;
+  background:linear-gradient(#8de3ff 0%,#d9f8ff 58%,#8bdc91 58%,#55b96c 100%);
+  min-height:100vh
+}
+header{text-align:center;padding:14px 10px 8px}
+h1{margin:0;color:#123c77;font-size:clamp(22px,4vw,34px)}
+.subtitle{margin:5px;font-size:14px}
+.game{
+  max-width:1450px;margin:auto;padding:12px;
+  display:grid;grid-template-columns:minmax(210px,1fr) minmax(300px,1.45fr) minmax(210px,1fr);
+  gap:14px
+}
+.player{
+  background:#ffffffed;border:3px solid white;border-radius:18px;
+  padding:12px;box-shadow:0 5px 14px #24517a30;
+  display:flex;flex-direction:column;gap:9px
+}
+.player.one{border-color:#277fdb}
+.player.two{border-color:#ee6659}
+.player h2{text-align:center;margin:0;color:#12336b}
+.player.two h2{color:#b83232}
+.scoreline{display:flex;justify-content:space-between;font-size:13px;font-weight:bold}
+.display{
+  background:#eaf5ff;border:2px solid #bfd8f2;border-radius:10px;
+  padding:10px;text-align:right;font-size:24px;font-weight:bold;
+  min-height:48px;overflow:hidden
+}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+.key{
+  border:0;border-radius:10px;padding:12px 5px;
+  background:#e7eff8;color:#18375e;font-weight:bold;
+  font-size:18px;box-shadow:0 3px #c5d5e5
+}
+.key:active{transform:translateY(2px)}
+.key.op{background:#ffe3ad}
+.key.clear{background:#ffd1ce;color:#9c2525}
+.key.equal{background:#d5f3df;color:#12633b}
+.submit{
+  border:0;border-radius:12px;background:#168bd2;color:white;
+  font-weight:bold;padding:13px;font-size:15px
+}
+.two .submit{background:#e04e45}
+.submit:disabled{opacity:.5}
+.status{text-align:center;font-weight:bold;font-size:13px;min-height:36px}
+.arena{
+  background:#ffffff70;border:2px solid #ffffffa8;border-radius:18px;
+  padding:12px;display:flex;flex-direction:column;
+  align-items:center;justify-content:space-between;min-height:510px
+}
+.questionbox{
+  width:100%;text-align:center;background:white;border-radius:14px;
+  padding:12px
+}
+.label{font-size:12px;font-weight:bold;color:#58718c}
+#question{font-size:clamp(25px,4vw,38px);font-weight:900;color:#173c76;margin:8px}
+#round{font-size:12px;color:#5a7189}
+.race{
+  width:100%;flex:1;display:grid;grid-template-columns:1fr 1fr;
+  gap:18px;align-items:end;padding:12px 12px 0
+}
+.climb-lane{
+  height:330px;position:relative;display:flex;
+  justify-content:center;align-items:flex-end
+}
+.pole{
+  position:absolute;bottom:0;width:15px;height:280px;
+  background:linear-gradient(90deg,#8c4c1c,#d18a3b,#8a4819);
+  border:2px solid #744016;border-radius:8px 8px 2px 2px
+}
+.topbar{
+  position:absolute;bottom:274px;width:100px;height:12px;
+  border-radius:8px;background:#18894c;border:2px solid #0d6938
+}
+.flag{position:absolute;bottom:286px;font-size:25px;z-index:2}
+.gift{position:absolute;bottom:294px;font-size:27px;z-index:2}
+.climber{
+  position:absolute;bottom:5px;left:calc(50% + 14px);
+  font-size:30px;transform:translateX(-50%);
+  transition:bottom .55s cubic-bezier(.2,.8,.2,1);z-index:3
+}
+.lane-name{position:absolute;bottom:-22px;font-size:12px;font-weight:bold}
+.one-lane .lane-name{color:#1268b5}
+.two-lane .lane-name{color:#bd342e}
+.progress{
+  width:100%;display:flex;justify-content:space-between;
+  font-size:12px;font-weight:bold;padding:8px
+}
+.controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.control{border:0;border-radius:20px;padding:10px 17px;background:#123c77;color:white;font-weight:bold}
+.control.secondary{background:white;color:#123c77}
+.win{font-size:18px;font-weight:900;color:#087a45;min-height:24px;text-align:center}
+.instructions{text-align:center;font-size:13px;padding:0 14px;margin:15px auto 20px}
+@media(max-width:850px){
+  .game{grid-template-columns:1fr 1fr;grid-template-areas:"arena arena" "p1 p2"}
+  .arena{grid-area:arena;min-height:470px}
+  .player.one{grid-area:p1}
+  .player.two{grid-area:p2}
+  .climb-lane{height:290px}
+  .pole{height:240px}
+  .topbar{bottom:234px}
+  .flag{bottom:246px}
+  .gift{bottom:254px}
+}
+@media(max-width:520px){
+  .game{padding:8px;gap:8px}
+  .player{padding:8px;gap:7px}
+  .player h2{font-size:16px}
+  .key{padding:11px 2px;font-size:16px}
+  .arena{min-height:410px;padding:8px}
+  .race{gap:4px;padding:8px 0 0}
+  .climb-lane{height:255px}
+  .pole{height:205px;width:12px}
+  .topbar{bottom:199px}
+  .flag{bottom:211px}
+  .gift{bottom:219px}
+  .climber{font-size:26px}
+  .display{font-size:19px}
+  .submit{font-size:13px;padding:11px 5px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>🇮🇩 PANJAT PINANG MATEMATIKA 🇮🇩</h1>
+  <p class="subtitle">Dua pemain, dua tiang, satu perlombaan!</p>
+</header>
+
+<main class="game">
+
+  <!-- PEMAIN 1 -->
+  <section class="player one">
+    <h2>🔵 PEMAIN 1</h2>
+    <div class="scoreline">
+      <span>Skor: <b id="score1">0</b></span>
+      <span>Level: <b id="level1">0</b>/8</span>
+    </div>
+    <div class="display" id="display1">0</div>
+    <div class="keys" id="keys1"></div>
+    <button class="submit" id="submit1" onclick="submitAnswer(1)">KIRIM JAWABAN</button>
+    <div class="status" id="status1">Siap menghitung!</div>
+  </section>
+
+  <!-- ARENA PANJAT PINANG -->
+  <section class="arena">
+    <div class="questionbox">
+      <div class="label">SOAL UNTUK KEDUA PEMAIN</div>
+      <div id="question">Tekan Mulai!</div>
+      <div id="round">Jawab dengan cepat dan tepat.</div>
+    </div>
+
+    <div class="race">
+      <div class="climb-lane one-lane">
+        <div class="flag">🇮🇩</div>
+        <div class="gift">🎁</div>
+        <div class="topbar"></div>
+        <div class="pole"></div>
+        <div class="climber" id="climber1">🧗‍♂️</div>
+        <div class="lane-name">Tiang Pemain 1</div>
+      </div>
+
+      <div class="climb-lane two-lane">
+        <div class="flag">🇮🇩</div>
+        <div class="gift">🎁</div>
+        <div class="topbar"></div>
+        <div class="pole"></div>
+        <div class="climber" id="climber2">🧗‍♀️</div>
+        <div class="lane-name">Tiang Pemain 2</div>
+      </div>
+    </div>
+
+    <div class="progress">
+      <span>🔵 Pemain 1: <span id="progress1">0%</span></span>
+      <span>🔴 Pemain 2: <span id="progress2">0%</span></span>
+    </div>
+
+    <div class="win" id="win"></div>
+
+    <div class="controls">
+      <button class="control" onclick="startGame()">▶ MULAI / ULANG</button>
+      <button class="control secondary" onclick="toggleSound()" id="soundButton">🔊 Suara: ON</button>
+    </div>
+  </section>
+
+  <!-- PEMAIN 2 -->
+  <section class="player two">
+    <h2>🔴 PEMAIN 2</h2>
+    <div class="scoreline">
+      <span>Skor: <b id="score2">0</b></span>
+      <span>Level: <b id="level2">0</b>/8</span>
+    </div>
+    <div class="display" id="display2">0</div>
+    <div class="keys" id="keys2"></div>
+    <button class="submit" id="submit2" onclick="submitAnswer(2)">KIRIM JAWABAN</button>
+    <div class="status" id="status2">Siap menghitung!</div>
+  </section>
+
+</main>
+
+<p class="instructions">
+  Kedua pemain mendapatkan soal yang sama. Gunakan kalkulator masing-masing.
+  Jawaban benar membuat karakter naik satu tingkat. Jawaban salah boleh dicoba lagi.
+  Pemain pertama yang mencapai puncak menjadi pemenang!
+</p>
+
+<script>
+const TARGET = 8;
+let answer = 0;
+let round = 0;
+let active = false;
+let soundOn = true;
+
+const players = {
+  1:{value:"",level:0,score:0,locked:false},
+  2:{value:"",level:0,score:0,locked:false}
+};
+
+const keyLayout = [
+  ["7","8","9"],
+  ["4","5","6"],
+  ["1","2","3"],
+  ["−","0","⌫"],
+  ["C","+","×"],
+  ["÷","=","."]
+];
+
+function buildKeypads(){
+  [1,2].forEach(id=>{
+    const box=document.getElementById("keys"+id);
+    box.innerHTML="";
+
+    keyLayout.flat().forEach(k=>{
+      const b=document.createElement("button");
+      b.className="key "+(
+        ["+","−","×","÷"].includes(k)?"op ":""
+      )+(
+        ["C","⌫"].includes(k)?"clear ":""
+      )+(k==="="?"equal":"");
+
+      b.textContent=k;
+      b.onclick=()=>pressKey(id,k);
+      box.appendChild(b);
+    });
+  });
+}
+
+function pressKey(id,key){
+  if(!active || players[id].locked) return;
+
+  const p=players[id];
+
+  if(key==="C"){
+    p.value="";
+  }
+  else if(key==="⌫"){
+    p.value=p.value.slice(0,-1);
+  }
+  else if(key==="="){
+    const m=p.value.match(/^(-?\d+(?:\.\d+)?)\s*([+\-*/])\s*(-?\d+(?:\.\d+)?)$/);
+
+    if(m){
+      const a=Number(m[1]);
+      const b=Number(m[3]);
+      const op=m[2];
+
+      if(op==="/" && b===0){
+        document.getElementById("status"+id).textContent="Tidak bisa dibagi nol.";
+        return;
+      }
+
+      const result=op==="+"?a+b:
+                   op==="-"?a-b:
+                   op==="*"?a*b:a/b;
+
+      p.value=String(Number(result.toFixed(8)));
+    }
+  }
+  else if(["+","−","×","÷"].includes(key)){
+    const op=key==="−"?"-":key==="×"?"*":"/";
+
+    if(p.value && /\d$/.test(p.value) && p.value.length<18){
+      p.value+=op;
+    }
+  }
+  else if(key==="."){
+    if(p.value.length<18 && !/[.]\d*$/.test(p.value)){
+      p.value+=".";
+    }
+  }
+  else if(p.value.length<18){
+    p.value+=key;
+  }
+
+  updateDisplay(id);
+  beep(420,.035);
+}
+
+function updateDisplay(id){
+  const shown=players[id].value
+    .replaceAll("*"," × ")
+    .replaceAll("/"," ÷ ")
+    .replaceAll("-"," − ")
+    .replaceAll("+"," + ");
+
+  document.getElementById("display"+id).textContent=shown||"0";
+}
+
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function newQuestion(){
+  let a,b,op;
+  const ops=["+","−","×","÷"];
+  op=ops[Math.floor(Math.random()*ops.length)];
+
+  if(op==="+"){
+    a=rand(5,60);
+    b=rand(2,40);
+    answer=a+b;
+  }
+  else if(op==="−"){
+    a=rand(10,80);
+    b=rand(1,a);
+    answer=a-b;
+  }
+  else if(op==="×"){
+    a=rand(2,12);
+    b=rand(2,12);
+    answer=a*b;
+  }
+  else{
+    b=rand(2,12);
+    answer=rand(2,12);
+    a=b*answer;
+  }
+
+  document.getElementById("question").textContent=`${a} ${op} ${b} = ?`;
+  document.getElementById("round").textContent=
+    `Ronde ${round} • Target: ${TARGET} tingkat`;
+}
+
+function submitAnswer(id){
+  if(!active || players[id].locked) return;
+
+  const p=players[id];
+
+  if(p.value.trim()===""){
+    document.getElementById("status"+id).textContent="Masukkan jawaban dulu!";
+    return;
+  }
+
+  const numeric=Number(p.value);
+
+  if(Number.isFinite(numeric) && numeric===answer){
+    p.level++;
+    p.score++;
+    p.locked=true;
+
+    document.getElementById("status"+id).textContent=
+      "✅ Benar! Kamu naik satu tingkat.";
+
+    document.getElementById("submit"+id).disabled=true;
+
+    updatePlayer(id);
+    beep(760,.12);
+
+    if(p.level>=TARGET){
+      finishGame(id);
+      return;
+    }
+
+    if(players[1].locked && players[2].locked){
+      nextRound();
+    }
+  }
+  else{
+    document.getElementById("status"+id).textContent=
+      "❌ Belum tepat, coba hitung lagi!";
+
+    p.value="";
+    updateDisplay(id);
+    beep(180,.13);
+  }
+}
+
+function updatePlayer(id){
+  const p=players[id];
+
+  document.getElementById("score"+id).textContent=p.score;
+  document.getElementById("level"+id).textContent=p.level;
+
+  document.getElementById("progress"+id).textContent=
+    Math.round(p.level/TARGET*100)+"%";
+
+  document.getElementById("climber"+id).style.bottom=
+    (5+p.level*29)+"px";
+}
+
+function nextRound(){
+  round++;
+
+  [1,2].forEach(id=>{
+    players[id].locked=false;
+    players[id].value="";
+
+    updateDisplay(id);
+
+    document.getElementById("submit"+id).disabled=false;
+    document.getElementById("status"+id).textContent=
+      "Soal baru! Ayo cepat!";
+  });
+
+  newQuestion();
+}
+
+function startGame(){
+  active=true;
+  round=1;
+
+  [1,2].forEach(id=>{
+    players[id]={
+      value:"",
+      level:0,
+      score:0,
+      locked:false
+    };
+
+    document.getElementById("submit"+id).disabled=false;
+    document.getElementById("status"+id).textContent=
+      "Siap! Hitung secepat mungkin.";
+
+    updateDisplay(id);
+    updatePlayer(id);
+  });
+
+  document.getElementById("win").textContent="";
+  newQuestion();
+}
+
+function finishGame(id){
+  active=false;
+
+  document.getElementById("win").textContent=
+    `🏆 PEMAIN ${id} MENANG! SELAMAT! 🏆`;
+
+  [1,2].forEach(n=>{
+    document.getElementById("submit"+n).disabled=true;
+  });
+
+  beep(880,.25);
+  setTimeout(()=>beep(1100,.3),220);
+}
+
+let audio;
+
+function beep(freq,duration){
+  if(!soundOn) return;
+
+  try{
+    audio=audio||new (window.AudioContext||window.webkitAudioContext)();
+
+    if(audio.state==="suspended") audio.resume();
+
+    const osc=audio.createOscillator();
+    const gain=audio.createGain();
+
+    osc.frequency.value=freq;
+    osc.type="sine";
+    gain.gain.value=.07;
+
+    osc.connect(gain);
+    gain.connect(audio.destination);
+
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(
+      .001,audio.currentTime+duration
+    );
+
+    osc.stop(audio.currentTime+duration);
+  }catch(e){}
+}
+
+function toggleSound(){
+  soundOn=!soundOn;
+
+  document.getElementById("soundButton").textContent=
+    soundOn?"🔊 Suara: ON":"🔇 Suara: OFF";
+}
+
+buildKeypads();
+</script>
+</body>
+</html>
+
